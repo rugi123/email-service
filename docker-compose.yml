@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  nats:
+    image: nats:2.9-alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"  # Мониторинг
+    command: "-js"  # Включаем JetStream
+    volumes:
+      - nats_data:/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  nats_data:
+
+networks:
+  app-network:
+    driver: bridge
