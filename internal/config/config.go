@@ -7,21 +7,21 @@ import (
 )
 
 type App struct {
-	Name     string
-	Env      string
-	LogLevel string
+	Name     string `yaml:"name"`
+	Env      string `yaml:"env"`
+	LogLevel string `yaml:"log_level"`
 }
 
 type SMTP struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
 }
 
 type Config struct {
-	AppConfig  App
-	SMTPConfig SMTP
+	AppConfig  App  `yaml:"app"`
+	SMTPConfig SMTP `yaml:"smtp"`
 }
 
 func Load(path string) (*Config, error) {

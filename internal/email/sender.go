@@ -1,6 +1,8 @@
 package email
 
 import (
+	"crypto/tls"
+
 	"github.com/rugi123/email-service/internal/config"
 	"github.com/rugi123/email-service/internal/models"
 	"gopkg.in/gomail.v2"
@@ -11,7 +13,11 @@ type Sender struct {
 }
 
 func NewSender(cfg config.SMTP) *Sender {
-	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.Password, cfg.Password)
+	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.Username, cfg.Password)
+	d.SSL = false
+	d.TLSConfig = &tls.Config{
+		ServerName: cfg.Host,
+	}
 	return &Sender{
 		dialer: d,
 	}
@@ -19,7 +25,7 @@ func NewSender(cfg config.SMTP) *Sender {
 
 func (s *Sender) Send(letter models.Letter) error {
 	m := gomail.NewMessage()
-	m.SetHeader("From", letter.Sender)
+	m.SetHeader("From", s.dialer.Username)
 	m.SetHeader("To", letter.Receiver)
 	m.SetHeader("Subject", letter.Subject)
 	m.SetBody("text/plain", letter.Body)
