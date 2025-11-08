@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 
 	"github.com/rugi123/email-service/internal/config"
-	"github.com/rugi123/email-service/internal/models"
+	"github.com/rugi123/email-service/internal/domain/models"
 	"gopkg.in/gomail.v2"
 )
 
@@ -23,12 +23,12 @@ func NewSender(cfg config.SMTP) *Sender {
 	}
 }
 
-func (s *Sender) Send(letter models.Letter) error {
+func (s *Sender) Send(email models.Email) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", s.dialer.Username)
-	m.SetHeader("To", letter.Receiver)
-	m.SetHeader("Subject", letter.Subject)
-	m.SetBody("text/plain", letter.Body)
+	m.SetHeader("To", email.To)
+	m.SetHeader("Subject", email.Subject)
+	m.SetBody("text/plain", email.Body)
 
 	err := s.dialer.DialAndSend(m)
 

@@ -1,25 +1,21 @@
 FROM golang:1.25-alpine AS builder
-
 WORKDIR /app
-
 COPY go.mod go.sum ./
 RUN go mod download
-
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/worker
+RUN go build -o main ./cmd/worker
 
+# Создаем новый этап для финального образа
 FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-# Копируем бинарник
+# Копируем бинарник из builder этапа
 COPY --from=builder /app/main .
 
-# Копируем конфиг файлы
-COPY --from=builder /app/internal/config ./internal/config/
-
-EXPOSE 8080
+# Копируем конфигурационный файл в текущую рабочую директорию
+COPY --from=builder /app/internal/config/config.yaml ./config.yaml
 
 CMD ["./main"]
